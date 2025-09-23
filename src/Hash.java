@@ -1,3 +1,6 @@
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -12,20 +15,25 @@ public class Hash {
         Scanner in = new Scanner(System.in);
         String input = in.nextLine();
 
-        List<String> splittedString = usingSplitMethod(input, 7);
-        for (String i : splittedString){
-            System.out.println(i);
-        }
+        int[] resultList = {0, 0, 0, 0, 0, 0, 0, 0};
 
+        List<String> splitString = usingSplitMethod(input, 8);
 
+        String hash = "";
+
+        System.out.println(hash);
 
     }
 
+    //Splits the input string into equally sized substrings
     public static List<String> usingSplitMethod(String text, int n) {
         String[] results = text.split("(?<=\\G.{" + n + "})");
 
         return Arrays.asList(results);
     }
 
-
+    //Turns String into a hexadecimal
+    public String toHex(String arg) {
+        return String.format("%040x", new BigInteger(1, arg.getBytes(StandardCharsets.UTF_8)));
+    }
 }
