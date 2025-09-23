@@ -18,7 +18,8 @@ public class Hash {
         int splitLength = length / 10; //Kokio ilgio bus kiekviena dalis
 
         List<String> hashuojami = usingSplitMethod(input, splitLength); //Splittina input į dalis
-
+        int[] kodukai = new int[11];
+        int c = 0;
         int count = 1;
         for (String x : hashuojami){
             String hexas = toHex(x);
@@ -30,8 +31,16 @@ public class Hash {
             kodas += (x.charAt(0)+count);
             count+= x.charAt(0);
             int kodukas = prekesKodai[addFirstLastNum(kodas)];
-            System.out.println(kodukas);
+            kodukai[c] = kodukas;
+            c++;
         }
+
+        String preHash = "";
+        for (int k : kodukai){
+            String numStr = String.valueOf(k);
+            preHash += numStr;
+        }
+
     }
 
     //Splits the input string into equally sized substrings
@@ -45,7 +54,6 @@ public class Hash {
     public static String toHex(String arg) {
         return String.format("%040x", new BigInteger(1, arg.getBytes(StandardCharsets.UTF_8)));
     }
-
 
     public static int addFirstLastNum(double number) {
         String numStr = String.valueOf((long) number);
