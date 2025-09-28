@@ -14,23 +14,16 @@ public:
     public std::string generateHash(string::input){
         string darbinis = stringToHex(input);
 
+        int weightedSum = weightedSum(darbinis);
 
-
-
-
-
-
-
-
-
-
-
+    
 
 
 
         
     }
 
+    //reference: https://stackoverflow.com/questions/3381614/c-convert-string-to-hexadecimal-and-vice-versa
     std::string stringToHex(const std::string& input) {
         std::stringstream ss;
         for (unsigned char c : input) {
@@ -47,8 +40,14 @@ public:
             count++;
         }
 
-        return weightedSum;
+        return weightedSum % 440; //prekesKodai dydis
     }
+
+    uint16_t varikliukas(uint16_t seed, int offset){
+        return (seed * 8345762 + 1083475412 + offset) % std::numeric_limits<uint16_t>::std::max();
+    }
+
+
 }
 
 const int HashGenerator::prekesKodai[440] = {
