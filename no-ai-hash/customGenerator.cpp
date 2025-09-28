@@ -11,15 +11,46 @@ private:
     static const int prekesKodai[440];
 
 public:
-    public std::string generateHash(string:: input){
+    public std::string generateHash(string::input){
+        string darbinis = stringToHex(input);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         
     }
 
+    std::string stringToHex(const std::string& input) {
+        std::stringstream ss;
+        for (unsigned char c : input) {
+            ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
+        }
+        return ss.str();
+    }
+
+    int weightedSum(string input){
+        int count = 1;
+        int weightedSum = 0;
+        for (char c : darbinis){
+            weightedSum += c * count;
+            count++;
+        }
+
+        return weightedSum;
+    }
 }
 
-
-
-//naudoti kaip seed std::ranlux24_base generator(seed); uint64_t number = g enerator(); generator.discard(offset); 
 const int HashGenerator::prekesKodai[440] = {
     375489, 396069, 376381, 347557, 376206, 405686, 410243, 344899, 375468, 381335,
     338017, 396083, 389180, 410870, 347591, 384593, 365675, 366992, 383811, 394402,
