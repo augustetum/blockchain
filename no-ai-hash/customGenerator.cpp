@@ -1,3 +1,4 @@
+#include "customGenerator.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -5,26 +6,25 @@
 #include <iomanip>
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
-class HashGenerator {
-private:
-    static const int prekesKodai[440];
+using namespace std;
 
-public:
-    public std::string generateHash(string::input){
+    string HashGenerator::generateHash(string input){
         string darbinis = stringToHex(input);
 
-        int weightedSum = weightedSum(darbinis);
+        int weightSum = weightedSum(input);
+        int offset = (int) input.back(); //vat sita vieta biski nepatinka TODO: upgradint
 
-    
+        uint32_t result = varikliukas(prekesKodai[weightSum], offset); 
 
+        std::cout << std::setfill('0') << std::setw(8) << std::hex << result << '\n'; //https://stackoverflow.com/questions/43028865/how-to-print-hex-from-uint32-t
 
-
-        
+        return 0;
     }
 
     //reference: https://stackoverflow.com/questions/3381614/c-convert-string-to-hexadecimal-and-vice-versa
-    std::string stringToHex(const std::string& input) {
+    std::string HashGenerator::stringToHex(const std::string& input) {
         std::stringstream ss;
         for (unsigned char c : input) {
             ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
@@ -32,10 +32,10 @@ public:
         return ss.str();
     }
 
-    int weightedSum(string input){
+    int HashGenerator::weightedSum(string input){
         int count = 1;
         int weightedSum = 0;
-        for (char c : darbinis){
+        for (char c : input){
             weightedSum += c * count;
             count++;
         }
@@ -43,12 +43,10 @@ public:
         return weightedSum % 440; //prekesKodai dydis
     }
 
-    uint16_t varikliukas(uint16_t seed, int offset){
-        return (seed * 8345762 + 1083475412 + offset) % std::numeric_limits<uint16_t>::std::max();
+    uint32_t HashGenerator::varikliukas(uint32_t seed, int offset){
+        return (seed * 8345762 + 1083475412 + offset) % std::numeric_limits<uint32_t>::max();
     }
 
-
-}
 
 const int HashGenerator::prekesKodai[440] = {
     375489, 396069, 376381, 347557, 376206, 405686, 410243, 344899, 375468, 381335,
@@ -96,8 +94,3 @@ const int HashGenerator::prekesKodai[440] = {
     408463, 388614, 371747, 415101, 421909, 387279, 370187, 410633, 372375, 419987,
     371262, 385125, 371167, 370531, 358334, 327840, 371288, 371794, 383417, 354371
 };
-
-int main() {
-    HashGenerator::generateHash();
-    return 0;
-}

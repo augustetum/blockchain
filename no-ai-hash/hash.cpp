@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "functions.h"
+#include "customGenerator.h"
 
 int main(){
 
@@ -18,6 +19,11 @@ int main(){
 
             std::string hashuojamasTekstas;
             std::cin >> hashuojamasTekstas;
+
+            HashGenerator hash;
+
+            std::string hashed = hash.generateHash(hashuojamasTekstas);
+            std::cout << hashed << std::endl;
             break;
         }  
 
