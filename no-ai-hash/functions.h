@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <random>
 
 std::string pasirinktiFaila();
 std::string failoNuskaitymas();

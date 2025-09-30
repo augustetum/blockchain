@@ -23,8 +23,6 @@ using namespace std;
         std::stringstream ss;
         ss << std::setfill('0') << std::setw(8) << std::hex << result;
         string resultString = ss.str();
-        std::cout<<"---"<<std::endl;
-        std::cout<<"Hasho ilgis: " << resultString.size() << " simboliai"<<std::endl;
         return resultString;
     }
 
