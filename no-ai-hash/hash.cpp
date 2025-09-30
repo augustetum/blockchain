@@ -11,7 +11,8 @@ int main(){
     std::cout << "Pasirinkite programos eigą:" << std::endl;
     std::cout << "1 | Įvesti norimą hashuoti tekstą ranka" << std::endl;
     std::cout << "2 | Nuskaityti failą" << std::endl;
-    std::cout << "3 | Kolizijų paieška"<<std::endl;
+    std::cout << "3 | Kolizijų paieška" << std::endl;
+    std::cout << "4 | Lavinos efekto testas" << std::endl;
     std::cin >> menuChoice;
 
     switch(menuChoice){
@@ -49,14 +50,11 @@ int main(){
 
         case 3:{
             kolizijos();
+            break;
+        case 4:
+            lavinosEfektas(100000);
         }
     }
-
-
-
-
-
-
 
     return 0;
 }
