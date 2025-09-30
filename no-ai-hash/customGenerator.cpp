@@ -20,7 +20,8 @@ using namespace std;
 
         std::cout << std::setfill('0') << std::setw(8) << std::hex << result << '\n'; //https://stackoverflow.com/questions/43028865/how-to-print-hex-from-uint32-t
 
-        return 0;
+        string ret = "hashas pabaigtas";
+        return ret;
     }
 
     //reference: https://stackoverflow.com/questions/3381614/c-convert-string-to-hexadecimal-and-vice-versa
