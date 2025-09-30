@@ -46,6 +46,10 @@ int main(){
             break;
 
         }
+
+        case 3:{
+            kolizijos();
+        }
     }
 
 

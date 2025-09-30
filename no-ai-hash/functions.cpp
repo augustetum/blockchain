@@ -11,6 +11,7 @@
 #include <utility>
 #include <iomanip>
 #include "functions.h"
+#include "customGenerator.h"
 
 
 
@@ -176,4 +177,60 @@ std::string stringGeneratorius(int length, std::mt19937& gen) {
     }
     
     return result;
+}
+
+void kolizijos() {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    HashGenerator hash;
+    
+    const int numPairs = 100000;
+    std::vector<int> lengths = {10, 100, 500, 1000};
+    
+    for (int length : lengths) {
+        std::cout << "String vienos poros simboliu skaicius: " << length << std::endl;
+        
+        auto startTime = std::chrono::high_resolution_clock::now();
+        
+        std::vector<std::pair<std::string, std::string>> stringPairs;
+        stringPairs.reserve(numPairs);
+        std::unordered_map<std::string, int> hashCount;
+        
+        
+        for (int i = 0; i < numPairs; ++i) {
+            std::string str1 = stringGeneratorius(length, gen); 
+            std::string str2 = stringGeneratorius(length, gen);  
+            stringPairs.push_back(std::make_pair(str1, str2));
+            std::string hash1 = hash.generateHash(str1);
+            std::string hash2 = hash.generateHash(str2);
+            
+            hashCount[hash1]++;
+            hashCount[hash2]++;
+        }
+        
+        std::cout << "Sugeneruotų porų skaičius : " << numPairs << std::endl;
+        
+        int collisionCount = 0;
+        int totalCollisions = 0;
+        std::vector<std::pair<std::string, int>> collisions;
+        
+        for (const auto& entry : hashCount) {
+            if (entry.second > 1) {
+                collisionCount++;
+                totalCollisions += (entry.second - 1);
+                collisions.push_back(entry);
+            }
+        }
+        
+        std::cout << "Kolizijų skaičius: " << totalCollisions << std::endl;
+        
+        double collisionRate = (double)totalCollisions / (numPairs * 2) * 100.0;
+        std::cout << "Kolizijų kiekis procentais: " << std::fixed << std::setprecision(4) 
+             << collisionRate << " %" << std::endl;
+        
+        auto endTime = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> diff = endTime - startTime;
+        std::cout << "Laikas: " << diff.count() << " s" << std::endl;
+    }
+    
 }
