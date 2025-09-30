@@ -3,4 +3,4 @@
 #include <string>
 
 std::string pasirinktiFaila();
-
+std::string failoNuskaitymas();
