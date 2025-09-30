@@ -159,3 +159,21 @@ std::string failoNuskaitymas(){
     return tekstas;
 }
     */
+
+
+// Funkcija atsitiktiniam string generavimui
+std::string stringGeneratorius(int length, std::mt19937& gen) {
+    static const char charset[] = 
+        "abcdefghijklmnopqrstuvwxyząčęėįšųū"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZĄČĘĖĮŠŲŪ"
+        "0123456789";
+    static const int charsetSize = sizeof(charset) - 1;
+    std::uniform_int_distribution<> dist(0, charsetSize - 1);
+    std::string result;
+    result.reserve(length);
+    for (int i = 0; i < length; ++i) {
+        result += charset[dist(gen)];
+    }
+    
+    return result;
+}
