@@ -64,8 +64,8 @@
 | Visos eilutės |  d18c9c3a | 9.464792 |
 
 
-Hashavimo laiko priklausomybė nuo eilučių kiekio pateikiama diagramoje:
-<img width="600" height="371" alt="Eilučių kiekio ir laiko santykis" src="https://github.com/user-attachments/assets/cd405688-fa3b-42b0-b15d-ae5aadb0acfc" />
+<img width="752" height="452" alt="image" src="https://github.com/user-attachments/assets/fe2fe6ed-9192-4dad-903e-ebe8934b7385" />
+
 
 # Kolizijų paieška
 
