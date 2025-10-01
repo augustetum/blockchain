@@ -311,8 +311,8 @@ Porų skaičius: 1000000, vieno string poroje ilgis: 10
 <table>
  <tr>
   <td></td>
-  <td><h2>AES HEX</h2></td>
-  <td><h2>v0.2 HEX</h2></td>
+  <td><h3>AES HEX</h3></td>
+  <td><h3>v0.2 HEX</h3></td>
  </tr>
 
  <tr>
@@ -338,8 +338,8 @@ Porų skaičius: 1000000, vieno string poroje ilgis: 10
 <table>
  <tr>
   <td></td>
-  <td><h2>AES BIT</h2></td>
-  <td><h2>v0.2 BIT</h2></td>
+  <td><h3>AES BIT</h3></td>
+  <td><h3>v0.2 BIT</h3></td>
  </tr>
 
  <tr>
