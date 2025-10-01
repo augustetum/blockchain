@@ -70,9 +70,12 @@ int main()
         }
         case 3:{
             kolizijos();
+            break;
         }
-        case4:{
-            //lavinosEfektas(100000);
+        case 4:{
+            lavinosEfektas(100000);
+            lavinosEfektasSHA(100000);
+            break;
         }
         return 0;
 

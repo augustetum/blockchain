@@ -99,8 +99,12 @@ std::string stringGeneratorius(int length, std::mt19937& gen) {
     return result;
 }
 
-// Function to calculate the number of differing bits between two strings
-/*int countBitDifference(const std::string& str1, const std::string& str2) {
+
+
+//lavinos testavimas AI IR SHA256
+
+//Function to calculate the number of differing bits between two strings
+int countBitDifference(const std::string& str1, const std::string& str2) {
     int diff = 0;
     for (size_t i = 0; i < str1.size() && i < str2.size(); ++i) {
         unsigned char x = str1[i] ^ str2[i];
@@ -124,7 +128,7 @@ int countHexDifference(const std::string& str1, const std::string& str2) {
 }
 
 void lavinosEfektas(int numPairs) {
-    HashGenerator hashGenerator;
+    //HashGenerator hashGenerator;
     std::random_device rd;
     std::mt19937 gen(rd());
     const int STRING_LENGTH = 64;  
@@ -154,8 +158,11 @@ void lavinosEfektas(int numPairs) {
         } while (newChar == original[pos]);
         modified[pos] = newChar;
 
-        std::string hash1 = hashGenerator.generateHash(original);
-        std::string hash2 = hashGenerator.generateHash(modified);
+        //AI
+        std::string hash1 = CustomHash::hash(original); //hashGenerator.generateHash(original);
+        std::string hash2 = CustomHash::hash(modified); //hashGenerator.generateHash(modified); 
+
+
         if (hash1.length() != hash2.length()) {
             std::cerr << "Klaida: Skirtingi hash ilgiai! " << hash1.length() << " vs " << hash2.length() << std::endl;
             continue;
@@ -175,11 +182,6 @@ void lavinosEfektas(int numPairs) {
         maxBitDiff = std::max(maxBitDiff, bitDiff);
         minHexDiff = std::min(minHexDiff, hexDiff);
         maxHexDiff = std::max(maxHexDiff, hexDiff);
-
-
-        if ((i + 1) % 10000 == 0 || i == 0 || i == numPairs - 1) {
-            std::cout << "Apdorota " << (i + 1) << " porų..." << std::endl;
-        }
     }
 
     auto endTime = std::chrono::high_resolution_clock::now();
@@ -187,12 +189,12 @@ void lavinosEfektas(int numPairs) {
 
     double avgBitDiff = static_cast<double>(totalBitDiff) / numPairs;
     double avgHexDiff = static_cast<double>(totalHexDiff) / numPairs;
-    double bitDiffPercentage = (avgBitDiff / (hashGenerator.generateHash("test").length() * 8)) * 100.0;
-    double hexDiffPercentage = (avgHexDiff / static_cast<double>(hashGenerator.generateHash("test").length())) * 100.0;
+    double bitDiffPercentage = (avgBitDiff / (CustomHash::hash("test").length() * 8)) * 100.0;  
+    double hexDiffPercentage = (avgHexDiff / static_cast<double>(CustomHash::hash("test").length())) * 100.0;
 
-    size_t hashBitLength = hashGenerator.generateHash("test").length() * 4; // Each hex char = 4 bits
+    size_t hashBitLength = CustomHash::hash("test").length() * 4; // Each hex char = 4 bits
     
-    std::cout << "\n=== Lavinos efekto testavimo rezultatai ===" << std::endl;
+    std::cout << "\n=== Lavinos efekto testavimo rezultatai AI ===" << std::endl;
     std::cout << "Iš viso išbandyta porų: " << numPairs << std::endl;
     std::cout << "Testo trukmė: " << duration.count() << " sekundžių" << std::endl;
     
@@ -209,8 +211,121 @@ void lavinosEfektas(int numPairs) {
     std::cout << "  Vidutinis skirtumas: " << avgHexDiff << " simboliai (" << hexDiffPercentage << "% hash'o ilgio)" << std::endl;
     std::cout << "  Porų be skirtumų: " << zeroHexDiffs << " (" << (zeroHexDiffs * 100.0 / numPairs) << "%)" << std::endl;
 
-    std::cout << "\n=== Testas baigtas ===" << std::endl;
-}*/
+}
+
+
+void lavinosEfektasSHA(int numPairs) {
+    
+    SHA256 sha1;
+    SHA256 sha;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    const int STRING_LENGTH = 64;  
+    std::uniform_int_distribution<> pos_dist(0, STRING_LENGTH - 1);
+    std::uniform_int_distribution<int> char_dist('a', 'z'); 
+
+    int totalBitDiff = 0, totalHexDiff = 0;
+    int minBitDiff = std::numeric_limits<int>::max(), maxBitDiff = 0;
+    int minHexDiff = std::numeric_limits<int>::max(), maxHexDiff = 0;
+    int zeroBitDiffs = 0, zeroHexDiffs = 0;
+
+    auto startTime = std::chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < numPairs; ++i) {
+        std::string original;
+        original.reserve(STRING_LENGTH);
+        for (int j = 0; j < STRING_LENGTH; ++j) {
+            original += static_cast<char>(char_dist(gen));
+        }
+        
+        std::string modified = original;
+        int pos = pos_dist(gen);
+        char newChar;
+        do {
+            newChar = static_cast<char>(char_dist(gen));
+        } while (newChar == original[pos]);
+        modified[pos] = newChar;
+
+        sha1.update(original);
+        sha.update(modified);
+
+        std::array<uint8_t, 32> digest1 = sha1.digest();
+        std::array<uint8_t, 32> digest = sha.digest();
+
+        std::string hash1 = SHA256::toString(digest1);  //hashGenerator.generateHash(original); CustomHash::hash(original);
+        std::string hash2 = SHA256::toString(digest); //hashGenerator.generateHash(modified); CustomHash::hash(modified);
+
+
+        if (hash1.length() != hash2.length()) {
+            std::cerr << "Klaida: Skirtingi hash ilgiai! " << hash1.length() << " vs " << hash2.length() << std::endl;
+            continue;
+        }
+
+        int bitDiff = countBitDifference(hash1, hash2);
+        int hexDiff = countHexDifference(hash1, hash2);
+
+
+        if (bitDiff == 0) zeroBitDiffs++;
+        if (hexDiff == 0) zeroHexDiffs++;
+
+
+        totalBitDiff += bitDiff;
+        totalHexDiff += hexDiff;
+        minBitDiff = std::min(minBitDiff, bitDiff);
+        maxBitDiff = std::max(maxBitDiff, bitDiff);
+        minHexDiff = std::min(minHexDiff, hexDiff);
+        maxHexDiff = std::max(maxHexDiff, hexDiff);
+    }
+
+    auto endTime = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = endTime - startTime;
+
+    SHA256 sha3;
+    sha.update("test");
+    std::array<uint8_t, 32> digest3 = sha3.digest();
+    std::string forSizeOfHash = SHA256::toString(digest3);
+
+
+
+    double avgBitDiff = static_cast<double>(totalBitDiff) / numPairs;
+    double avgHexDiff = static_cast<double>(totalHexDiff) / numPairs;
+    double bitDiffPercentage = (avgBitDiff / (forSizeOfHash.length() * 8)) * 100.0;
+    double hexDiffPercentage = (avgHexDiff / static_cast<double>(forSizeOfHash.length())) * 100.0;
+
+    size_t hashBitLength = forSizeOfHash.length() * 4; // Each hex char = 4 bits
+    
+    std::cout << "\n=== Lavinos efekto testavimo rezultatai SHA ===" << std::endl;
+    std::cout << "Iš viso išbandyta porų: " << numPairs << std::endl;
+    std::cout << "Testo trukmė: " << duration.count() << " sekundžių" << std::endl;
+    
+    std::cout << "\nBitų lygmenyje (hash ilgis: " << hashBitLength << " bitai):" << std::endl;
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "  Minimalus skirtumas: " << minBitDiff << " bitai (" << (minBitDiff * 100.0 / hashBitLength) << "%)" << std::endl;
+    std::cout << "  Maksimalus skirtumas: " << maxBitDiff << " bitai (" << (maxBitDiff * 100.0 / hashBitLength) << "%)" << std::endl;
+    std::cout << "  Vidutinis skirtumas: " << avgBitDiff << " bitai (" << bitDiffPercentage << "% hash'o ilgio)" << std::endl;
+    std::cout << "  Porų be skirtumų: " << zeroBitDiffs << " (" << (zeroBitDiffs * 100.0 / numPairs) << "%)" << std::endl;
+    
+    std::cout << "\nHex simbolių lygmenyje:" << std::endl;
+    std::cout << "  Minimalus skirtumas: " << minHexDiff << " simboliai (" << (minHexDiff * 100.0 / (hashBitLength/4)) << "%)" << std::endl;
+    std::cout << "  Maksimalus skirtumas: " << maxHexDiff << " simboliai (" << (maxHexDiff * 100.0 / (hashBitLength/4)) << "%)" << std::endl;
+    std::cout << "  Vidutinis skirtumas: " << avgHexDiff << " simboliai (" << hexDiffPercentage << "% hash'o ilgio)" << std::endl;
+    std::cout << "  Porų be skirtumų: " << zeroHexDiffs << " (" << (zeroHexDiffs * 100.0 / numPairs) << "%)" << std::endl;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void kolizijos() {
     int numPairs = 1000000;

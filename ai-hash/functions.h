@@ -15,6 +15,7 @@ std::string failoNuskaitymas();
 std::string stringGeneratorius(int length, std::mt19937& gen);
 void kolizijos();
 void lavinosEfektas(int numPairs = 100000);
+void lavinosEfektasSHA(int numPairs = 100000);
 class CustomHash {
 private:
     // Magic constants for mixing (derived from golden ratio and other mathematical constants)
