@@ -11,15 +11,15 @@
 #include <utility>
 #include <iomanip>
 #include "functions.h"
+#include "customGenerator.h"
 
 
 
-/* MAC
 std::string pasirinktiFaila(){
     while(true){
         try{
-            //system("ls *.txt failaiHashavimui/*.txt 2>/dev/null > temp.txt");    
-            system("for /r %A in (*.txt) do @echo %~nxA >> temp.txt");
+            system("ls *.txt failaiHashavimui/*.txt 2>/dev/null > temp.txt");    
+            //system("for /r %A in (*.txt) do @echo %~nxA >> temp.txt"); //windowsam
             std::ifstream tempFail("temp.txt");
             std::vector<std::string> failuPav;
      
@@ -29,8 +29,8 @@ std::string pasirinktiFaila(){
 
             }
             tempFail.close();
-            //system("rm temp.txt");
-            system("del temp.txt");
+            system("rm temp.txt"); 
+            //system("del temp.txt"); windowsam
             std::string fail;
 
             std::cout << "Pasirinkite norimą failą" << std::endl;
@@ -58,6 +58,7 @@ std::string pasirinktiFaila(){
     }
 }
 
+
 std::string failoNuskaitymas(){
     std::string fileName = pasirinktiFaila();
     std::ifstream f(fileName);
@@ -72,10 +73,10 @@ std::string failoNuskaitymas(){
     }
     f.close();
     return tekstas;
-}*/
+}
 
 
-//windowsams
+/*
 namespace fs = std::filesystem;
 std::string pasirinktiFaila(){
     while(true){
@@ -158,6 +159,8 @@ std::string failoNuskaitymas(){
     f.close();
     return tekstas;
 }
+    */
+
 
 // Funkcija atsitiktiniam string generavimui
 std::string stringGeneratorius(int length, std::mt19937& gen) {
@@ -175,53 +178,150 @@ std::string stringGeneratorius(int length, std::mt19937& gen) {
     return result;
 }
 
-//nu kazkodel to hasho nemato declarimnto
-void kolizijos() {
+// Function to calculate the number of differing bits between two strings
+int countBitDifference(const std::string& str1, const std::string& str2) {
+    int diff = 0;
+    for (size_t i = 0; i < str1.size() && i < str2.size(); ++i) {
+        unsigned char x = str1[i] ^ str2[i];
+        while (x) {
+            diff += x & 1;
+            x >>= 1;
+        }
+    }
+    return diff;
+}
+
+// Function to calculate the number of differing hex characters between two strings
+int countHexDifference(const std::string& str1, const std::string& str2) {
+    int diff = 0;
+    for (size_t i = 0; i < str1.size() && i < str2.size(); ++i) {
+        if (str1[i] != str2[i]) {
+            diff++;
+        }
+    }
+    return diff;
+}
+
+void lavinosEfektas(int numPairs) {
+    HashGenerator hashGenerator;
     std::random_device rd;
     std::mt19937 gen(rd());
-    HashGenerator hash;
-    
-    const int numPairs = 100000;
-    std::vector<int> lengths = {10, 100, 500, 1000};
-    
-    for (int length : lengths) {
-        std::cout << "String vienos poros simboliu skaicius: " << length << std::endl;
-        
-        std::vector<std::pair<std::string, std::string>> stringPairs;
-        stringPairs.reserve(numPairs);
-        std::unordered_map<std::string, int> hashCount;
-        
-        
-        for (int i = 0; i < numPairs; ++i) {
-            std::string str1 = stringGeneratorius(length, gen); 
-            std::string str2 = stringGeneratorius(length, gen);  
-            stringPairs.push_back(std::make_pair(str1, str2));
-            std::string hash1 = hash.generateHash(str1);
-            std::string hash2 = hash.generateHash(str2);
-            
-            hashCount[hash1]++;
-            hashCount[hash2]++;
+    const int STRING_LENGTH = 64;  
+    std::uniform_int_distribution<> pos_dist(0, STRING_LENGTH - 1);
+    std::uniform_int_distribution<int> char_dist('a', 'z'); 
+
+    int totalBitDiff = 0, totalHexDiff = 0;
+    int minBitDiff = std::numeric_limits<int>::max(), maxBitDiff = 0;
+    int minHexDiff = std::numeric_limits<int>::max(), maxHexDiff = 0;
+    int zeroBitDiffs = 0, zeroHexDiffs = 0;
+
+    auto startTime = std::chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < numPairs; ++i) {
+        std::string original;
+        original.reserve(STRING_LENGTH);
+        for (int j = 0; j < STRING_LENGTH; ++j) {
+            original += static_cast<char>(char_dist(gen));
         }
         
-        std::cout << "Sugeneruotų porų skaičius : " << numPairs << std::endl;
-        
-        int collisionCount = 0;
-        int totalCollisions = 0;
-        std::vector<std::pair<std::string, int>> collisions;
-        
-        for (const auto& entry : hashCount) {
-            if (entry.second > 1) {
-                collisionCount++;
-                totalCollisions += (entry.second - 1);
-                collisions.push_back(entry);
-            }
+
+        std::string modified = original;
+        int pos = pos_dist(gen);
+        char newChar;
+        do {
+            newChar = static_cast<char>(char_dist(gen));
+        } while (newChar == original[pos]);
+        modified[pos] = newChar;
+
+        std::string hash1 = hashGenerator.generateHash(original);
+        std::string hash2 = hashGenerator.generateHash(modified);
+        if (hash1.length() != hash2.length()) {
+            std::cerr << "Klaida: Skirtingi hash ilgiai! " << hash1.length() << " vs " << hash2.length() << std::endl;
+            continue;
         }
-        
-        std::cout << "Kolizijų skaičius: " << totalCollisions << std::endl;
-        
-        double collisionRate = (double)totalCollisions / (numPairs * 2) * 100.0;
-        std::cout << "Kolizijų kiekis procentais: " << std::fixed << std::setprecision(4) 
-             << collisionRate << " %" << std::endl;
+
+        int bitDiff = countBitDifference(hash1, hash2);
+        int hexDiff = countHexDifference(hash1, hash2);
+
+
+        if (bitDiff == 0) zeroBitDiffs++;
+        if (hexDiff == 0) zeroHexDiffs++;
+
+
+        totalBitDiff += bitDiff;
+        totalHexDiff += hexDiff;
+        minBitDiff = std::min(minBitDiff, bitDiff);
+        maxBitDiff = std::max(maxBitDiff, bitDiff);
+        minHexDiff = std::min(minHexDiff, hexDiff);
+        maxHexDiff = std::max(maxHexDiff, hexDiff);
+
+
+        if ((i + 1) % 10000 == 0 || i == 0 || i == numPairs - 1) {
+            std::cout << "Apdorota " << (i + 1) << " porų..." << std::endl;
+        }
     }
+
+    auto endTime = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = endTime - startTime;
+
+    double avgBitDiff = static_cast<double>(totalBitDiff) / numPairs;
+    double avgHexDiff = static_cast<double>(totalHexDiff) / numPairs;
+    double bitDiffPercentage = (avgBitDiff / (hashGenerator.generateHash("test").length() * 8)) * 100.0;
+    double hexDiffPercentage = (avgHexDiff / static_cast<double>(hashGenerator.generateHash("test").length())) * 100.0;
+
+    size_t hashBitLength = hashGenerator.generateHash("test").length() * 4; // Each hex char = 4 bits
     
+    std::cout << "\n=== Lavinos efekto testavimo rezultatai ===" << std::endl;
+    std::cout << "Iš viso išbandyta porų: " << numPairs << std::endl;
+    std::cout << "Testo trukmė: " << duration.count() << " sekundžių" << std::endl;
+    
+    std::cout << "\nBitų lygmenyje (hash ilgis: " << hashBitLength << " bitai):" << std::endl;
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "  Minimalus skirtumas: " << minBitDiff << " bitai (" << (minBitDiff * 100.0 / hashBitLength) << "%)" << std::endl;
+    std::cout << "  Maksimalus skirtumas: " << maxBitDiff << " bitai (" << (maxBitDiff * 100.0 / hashBitLength) << "%)" << std::endl;
+    std::cout << "  Vidutinis skirtumas: " << avgBitDiff << " bitai (" << bitDiffPercentage << "% hash'o ilgio)" << std::endl;
+    std::cout << "  Porų be skirtumų: " << zeroBitDiffs << " (" << (zeroBitDiffs * 100.0 / numPairs) << "%)" << std::endl;
+    
+    std::cout << "\nHex simbolių lygmenyje:" << std::endl;
+    std::cout << "  Minimalus skirtumas: " << minHexDiff << " simboliai (" << (minHexDiff * 100.0 / (hashBitLength/4)) << "%)" << std::endl;
+    std::cout << "  Maksimalus skirtumas: " << maxHexDiff << " simboliai (" << (maxHexDiff * 100.0 / (hashBitLength/4)) << "%)" << std::endl;
+    std::cout << "  Vidutinis skirtumas: " << avgHexDiff << " simboliai (" << hexDiffPercentage << "% hash'o ilgio)" << std::endl;
+    std::cout << "  Porų be skirtumų: " << zeroHexDiffs << " (" << (zeroHexDiffs * 100.0 / numPairs) << "%)" << std::endl;
+
+    std::cout << "\n=== Testas baigtas ===" << std::endl;
+}
+
+void kolizijos() {
+    int numPairs = 1000000;
+    int length = 10;
+    std::cout << "String vienos poros simbolių skaičius: " << length << std::endl;
+    
+    HashGenerator hash;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    
+    auto startTime = std::chrono::high_resolution_clock::now();
+    
+    int pairCollisions = 0;
+    for (int i = 0; i < numPairs; ++i) {
+        std::string str1 = stringGeneratorius(length, gen);
+        std::string str2 = stringGeneratorius(length, gen);
+        
+        std::string hash1 = hash.generateHash(str1);
+        std::string hash2 = hash.generateHash(str2);
+        
+        if (hash1 == hash2) {
+            ++pairCollisions;
+        }
+    }
+
+    std::cout << "Porų skaičius: " << numPairs << std::endl;
+    std::cout << "Porų kolizijų skaičius: " << pairCollisions << std::endl;
+    double perPairRate = static_cast<double>(pairCollisions) / numPairs * 100.0;
+    std::cout << "Porų kolizijų tikimybė: " << std::fixed << std::setprecision(6)
+              << perPairRate << " %" << std::endl;
+    
+    auto endTime = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> diff = endTime - startTime;
+    std::cout << "Laikas: " << diff.count() << " s" << std::endl;
 }
