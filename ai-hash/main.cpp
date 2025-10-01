@@ -7,8 +7,10 @@ int main()
 {
 
     int hashInput;
-    std::cout << "Hashing string      | 1" << std::endl;
-    std::cout << "Hashing from a file | 2" << std::endl;
+    std::cout << "Įvesti ranka        | 1" << std::endl;
+    std::cout << "Nuskaityti is failo | 2" << std::endl;
+    std::cout<< "Kolizijų testas      | 3" <<std::endl;
+    std::cout<< "Lavinos testas       | 4"<<std::endl;
     std::cin >> hashInput;
     std::string input;
     switch(hashInput){
@@ -65,6 +67,12 @@ int main()
             std::cout<< "Laiko vidurkis SHA: " <<visasLaikasSHA /3 << " s" <<std::endl;
 
             break;
+        }
+        case 3:{
+            kolizijos();
+        }
+        case4:{
+            //lavinosEfektas(100000);
         }
         return 0;
 
