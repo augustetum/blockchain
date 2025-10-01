@@ -1,83 +1,109 @@
+#include <iostream>
+#include <string>
 #include <chrono>
 #include "functions.h"
 #include "SHA256.h"
-// hash generated with claude.ai
 
-int main()
-{
+int main() {
+    int menuChoice;
+                
+    std::cout << "Pasirinkite programos eigą:" << std::endl;
+    std::cout << "1 | Įvesti norimą hashuoti tekstą ranka" << std::endl;
+    std::cout << "2 | Nuskaityti failą" << std::endl;
+    std::cout << "3 | Kolizijų paieška" << std::endl;
+    std::cout << "4 | Lavinos efekto testas (CustomHash)" << std::endl;
+    std::cout << "5 | Lavinos efekto testas (SHA-256)" << std::endl;
+    std::cout << "6 | Hiding/puzzle-friendliness testas" << std::endl;
+    std::cout << "7 | Hash'avimo efektyvumo testas" << std::endl;
+    std::cin >> menuChoice;
 
-    int hashInput;
-    std::cout << "Įvesti ranka        | 1" << std::endl;
-    std::cout << "Nuskaityti is failo | 2" << std::endl;
-    std::cout<< "Kolizijų testas      | 3" <<std::endl;
-    std::cout<< "Lavinos testas       | 4"<<std::endl;
-    std::cin >> hashInput;
-    std::string input;
-    switch(hashInput){
-        case 1:{
-            std::cout << "Enter string to hash: ";
-            std::getline(std::cin, input);
-            std::cout << "Enter salt: ";
-            std::string salt;
-            std::getline(std::cin, salt);
-            std::string salted_input = input + salt;
-
-            std::string result = CustomHash::hash(salted_input);
-            std::cout<< result<<std::endl;
-            std::cout<< "Hasho ilgis: " << result.size()<<" simbolių"<<std::endl;
-            break;
+    switch(menuChoice) {
+        case 1: {
+            std::cout << "Pasirinkote teksto įvestį ranka" << std::endl;
+            std::cout << "---------------------------------" << std::endl;
             
-        }
+            std::cin.ignore(); 
+            std::string hashuojamasTekstas;
+            std::cout << "Įveskite tekstą: ";
+            std::getline(std::cin, hashuojamasTekstas);
+            
+            auto start = std::chrono::high_resolution_clock::now();
+            std::string hashed = CustomHash::hash(hashuojamasTekstas);
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> diff = end - start;
+            
+            std::cout << "\n=== Rezultatai ===" << std::endl;
+            std::cout << "Hash'as: " << hashed << std::endl;
+            std::cout << "Hash ilgis: " << hashed.size() << " simbolių" << std::endl;
+            std::cout << "Sugaišta laiko: " << diff.count() << " s" << std::endl;
+            break;
+        }  
 
-        case 2:{
-            std::string input = failoNuskaitymas();
-            std::cout << "Enter salt: ";
-            std::string salt;
-            std::getline(std::cin, salt);
-            std::string salted_input = input + salt;
-            double visasLaikas=0;
-            double visasLaikasSHA=0;
-
-            SHA256 sha;
-            sha.update(salted_input);
-
-            for(int i=0; i <= 2; i++){
-                auto start1 = std::chrono::high_resolution_clock::now();  
-                std::string result = CustomHash::hash(salted_input);
-                auto end1 = std::chrono::high_resolution_clock::now();
-                std::chrono::duration<double, std::milli> diff1 = end1 - start1;
-                visasLaikas += diff1.count();
-                if(i==2){ std::cout<< result<<std::endl;
-                    std::cout<< "Hasho ilgis: " << result.size()<<" simbolių"<<std::endl;
-                }
-
-
-                auto start = std::chrono::high_resolution_clock::now();
-                std::array<uint8_t, 32> digest = sha.digest();
-                auto end = std::chrono::high_resolution_clock::now();
-                std::chrono::duration<double, std::milli> diff = end - start;
-                visasLaikasSHA += diff.count();
-                if(i==2){
-                    std::cout << SHA256::toString(digest) <<" - SHA256 hashas" <<std::endl;
-                }
-
+        case 2: {
+            std::cout << "Pasirinkote nuskaityti duomenis iš failo" << std::endl;
+            std::cout << "----------------------------------------" << std::endl;
+            
+            std::cin.ignore(); 
+            std::string hashuojamasTekstas = failoNuskaitymas();
+            
+            if (hashuojamasTekstas.empty()) {
+                std::cout << "Klaida: Nepavyko nuskaityti failo arba jis tuščias." << std::endl;
+                break;
             }
-           
-            std::cout<< "Laiko vidurkis: " << visasLaikas / 3 <<" s"<< std::endl;
-            std::cout<< "Laiko vidurkis SHA: " <<visasLaikasSHA /3 << " s" <<std::endl;
 
+            auto start = std::chrono::high_resolution_clock::now();
+            std::string hashed = CustomHash::hash(hashuojamasTekstas);
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> diff = end - start;
+
+            std::cout << "\n=== Rezultatai ===" << std::endl;
+            std::cout << "Hash'as: " << hashed << std::endl;
+            std::cout << "Hash ilgis: " << hashed.size() << " simbolių" << std::endl;
+            std::cout << "Failo dydis: " << hashuojamasTekstas.length() << " simbolių" << std::endl;
+            std::cout << "Sugaišta laiko: " << diff.count() << " s" << std::endl;
             break;
         }
-        case 3:{
+
+        case 3: {
+            std::cout << "Pasirinkote kolizijų paiešką" << std::endl;
+            std::cout << "----------------------------" << std::endl;
             kolizijos();
             break;
         }
-        case 4:{
-            lavinosEfektas(100000);
-            lavinosEfektasSHA(100000);
+            
+        case 4: {
+            std::cout << "Pasirinkote lavinos efekto testą (CustomHash)" << std::endl;
+            std::cout << "--------------------------------------------" << std::endl;
+            int numPairs = 100000;
+            lavinosEfektas(numPairs);
             break;
         }
-        return 0;
-
+            
+        case 5: {
+            std::cout << "Pasirinkote lavinos efekto testą (SHA-256)" << std::endl;
+            std::cout << "------------------------------------------" << std::endl;
+            int numPairs = 100000;
+            lavinosEfektasSHA(numPairs);
+            break;
+        }
+            
+        case 6: {
+            std::cout << "Pasirinkote Hiding/puzzle-friendliness testą" << std::endl;
+            std::cout << "--------------------------------------------" << std::endl;
+            hidingPuzzleTest();
+            break;
+        }
+            
+        case 7: {
+            std::cout << "Pasirinkote hash'avimo efektyvumo testą" << std::endl;
+            std::cout << "----------------------------------------" << std::endl;
+            testHashPerformance();
+            break;
+        }
+            
+        default:
+            std::cout << "Neteisingas pasirinkimas!" << std::endl;
     }
+    
+    return 0;
 }
