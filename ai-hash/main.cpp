@@ -1,5 +1,6 @@
 #include <chrono>
 #include "functions.h"
+#include "SHA256.h"
 // hash generated with claude.ai
 
 int main()
@@ -32,20 +33,38 @@ int main()
             std::string salt;
             std::getline(std::cin, salt);
             std::string salted_input = input + salt;
-            int visasLaikas=0;
+            double visasLaikas=0;
+            
+            double visasLaikasSHA=0;
+
+            SHA256 sha;
+            sha.update(salted_input);
 
             for(int i=0; i <= 2; i++){
-                auto start = std::chrono::high_resolution_clock::now();
+                auto start1 = std::chrono::high_resolution_clock::now();
                 std::string result = CustomHash::hash(salted_input);
-                auto end = std::chrono::high_resolution_clock::now();
-                std::chrono::duration<double> diff = end - start;
-                visasLaikas += diff.count();
+                auto end1 = std::chrono::high_resolution_clock::now();
+                std::chrono::duration<double> diff1 = end1 - start1;
+                visasLaikas += diff1.count();
                 if(i==2){ std::cout<< result<<std::endl;
                     std::cout<< "Hasho ilgis: " << result.size()<<" simbolių"<<std::endl;
                 }
+
+
+                auto start = std::chrono::high_resolution_clock::now();
+                std::array<uint8_t, 32> digest = sha.digest();
+                auto end = std::chrono::high_resolution_clock::now();
+                std::chrono::duration<double> diff = end - start;
+                visasLaikasSHA += diff.count();
+                if(i==2){
+                    std::cout << SHA256::toString(digest) <<" - SHA256 hashas" <<std::endl;
+                }
+
             }
            
             std::cout<< "Laiko vidurkis: " << visasLaikas / 3 <<" s"<< std::endl;
+            std::cout<< "Laiko vidurkis SHA: " <<visasLaikasSHA /3 << " s" <<std::endl;
+
             break;
         }
         return 0;

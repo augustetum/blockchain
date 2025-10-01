@@ -1,6 +1,5 @@
 #include "functions.h"
 
-
 namespace fs = std::filesystem;
 std::string pasirinktiFaila(){
     while(true){
