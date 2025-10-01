@@ -1,4 +1,4 @@
-<img width = 200, src="https://logoeps.com/wp-content/uploads/2013/12/lidl-supermarkets-vector-logo.png">
+<img width="200" height="200" alt="image" src="https://github.com/user-attachments/assets/bb8988e7-55ae-4bef-9677-abc53650262f" />
 <h1>LIDL hashas</h1>
 
 
