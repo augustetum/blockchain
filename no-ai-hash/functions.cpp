@@ -172,7 +172,6 @@ std::string stringGeneratorius(int length, std::mt19937& gen) {
     for (int i = 0; i < length; ++i) {
         result += charset[dist(gen)];
     }
-    
     return result;
 }
 
@@ -187,8 +186,6 @@ void kolizijos() {
     
     for (int length : lengths) {
         std::cout << "String vienos poros simboliu skaicius: " << length << std::endl;
-        
-        auto startTime = std::chrono::high_resolution_clock::now();
         
         std::vector<std::pair<std::string, std::string>> stringPairs;
         stringPairs.reserve(numPairs);
@@ -225,10 +222,6 @@ void kolizijos() {
         double collisionRate = (double)totalCollisions / (numPairs * 2) * 100.0;
         std::cout << "Kolizijų kiekis procentais: " << std::fixed << std::setprecision(4) 
              << collisionRate << " %" << std::endl;
-        
-        auto endTime = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> diff = endTime - startTime;
-        std::cout << "Laikas: " << diff.count() << " s" << std::endl;
     }
     
 }
