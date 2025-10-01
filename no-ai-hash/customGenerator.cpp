@@ -18,10 +18,14 @@ using namespace std;
 
         uint32_t result = varikliukas(prekesKodai[weightSum], offset); 
 
-        std::cout << std::setfill('0') << std::setw(8) << std::hex << result << '\n'; //https://stackoverflow.com/questions/43028865/how-to-print-hex-from-uint32-t
+        //std::cout << std::setfill('0') << std::setw(8) << std::hex << result << '\n'; //https://stackoverflow.com/questions/43028865/how-to-print-hex-from-uint32-t
 
-        string ret = "hashas pabaigtas";
-        return ret;
+        std::stringstream ss;
+        ss << std::setfill('0') << std::setw(8) << std::hex << result;
+        string resultString = ss.str();
+        std::cout<<"---"<<std::endl;
+        std::cout<<"Hasho ilgis: " << resultString.size() << " simboliai"<<std::endl;
+        return resultString;
     }
 
     //reference: https://stackoverflow.com/questions/3381614/c-convert-string-to-hexadecimal-and-vice-versa

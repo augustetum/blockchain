@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <chrono>
 #include "functions.h"
 #include "customGenerator.h"
 
@@ -10,6 +11,7 @@ int main(){
     std::cout << "Pasirinkite programos eigą:" << std::endl;
     std::cout << "1 | Įvesti norimą hashuoti tekstą ranka" << std::endl;
     std::cout << "2 | Nuskaityti failą" << std::endl;
+    std::cout << "3 | Kolizijų paieška"<<std::emdl;
     std::cin >> menuChoice;
 
     switch(menuChoice){
@@ -21,7 +23,6 @@ int main(){
             std::cin >> hashuojamasTekstas;
 
             HashGenerator hash;
-
             std::string hashed = hash.generateHash(hashuojamasTekstas);
             std::cout << hashed << std::endl;
             break;
@@ -30,18 +31,23 @@ int main(){
         case 2: {
             std::cout << "Pasirinkote nuskaityti duomenis iš failo" << std::endl;
             std::cout << "----------------------------------------" << std::endl;
+            HashGenerator hash;
+            std::string hashuojamasTekstas = failoNuskaitymas();
+            //std::cout<< hashuojamasTekstas;
 
-            try {
-                std::string fail = pasirinktiFaila();
-            } catch (const char* e){
-                std::cout << "Nuskaitymas nepavyko. " << e << std::endl;
-                break;
-            } catch (const std::runtime_error &e){
-                std::cout << e.what();
-            }
+            auto start = std::chrono::high_resolution_clock::now();
+            std::string hashed = hash.generateHash(hashuojamasTekstas);
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double> diff = end - start;
 
+            std::cout << hashed << std::endl;
+
+            std::cout<< "Hashavimas truko: " << diff.count() << " s" <<std::endl;
             break;
 
+        }
+        case 3:{
+            kolizijos();
         }
         
     }
