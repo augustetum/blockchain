@@ -62,7 +62,7 @@ std::string failoNuskaitymas(){
     if (filePath.filename() == "konstitucija.txt") {
         int eiluciuSkaicus = 789;
         int nuskaitymoEilutes;
-        std::cout << " 'Konstitucija.txt' nuskaitomas eilučių kiekis: ";
+        std::cout << "'Konstitucija.txt' nuskaitomas eilučių kiekis: ";
         std::cin >> nuskaitymoEilutes;
 
         int nuskaitytosEilutes = 0;
