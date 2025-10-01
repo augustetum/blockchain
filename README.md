@@ -362,4 +362,46 @@ Porų skaičius: 1000000, vieno string poroje ilgis: 10
  
 </table>
 
+## LIDL ir AI hash lyginimas su SHA-256
+### Efektyvumo testo rezultatai
+
+Efektyvumo teste laimėtoju tapo AI hash, nors matoma, jog iki 64 eilučių, skirtumas tarp LIDL hash ir AI hash nėra toks didelis.
+| Eilučių skaičius | AI hash vidutinis hashavimo laikas(ms) | LIDL hash (v0.2) vidutinis hashavimo laikas(ms) | SHA-256 vidutinis hashavimo laikas (ms) | Greičiausias |
+| ---- | ---- | ---- | ---- | ---- |
+| 1 | 0.002958 |  0.002833   | 0.012625 | LIDL hash |
+| 2 | 0.003000 | 0.003417 |  0.015959 | AI hash |
+| 4 | 0.003083 |  0.004667    |  0.017167 | AI hash |
+| 8 | 0.003542 | 0.007042      |  0.025500 | AI hash |
+| 16 | 0.006250 | 0.017875    | 0.062000 | AI hash |
+| 32 |  0.010042 | 0.031916   |     0.104417    | AI hash |
+ |   64    |  0.019333    |   0.067042    |  0.185333 | AI hash |
+  |  128   |      0.041708  |  0.156375   |        0.473875 | AI hash |
+| 256    |  0.090875  |    0.294375   |    0.968084   | AI hash |
+| 512              |   0.173583   |   0.681292     |   2.039125   | AI hash |
+| 789              |   0.276500   |    1.073000      |  3.083833 | AI hash |
+
+
+### Lavinos efekto testo rezultatai
+
+
+
+#### Bitų lygmenyje:
+|  | AI hash | SHA-256  | LIDL (v0.2) hash|
+|---|---|---|---|
+|Minimalus skirtumas| 121/256 bitų (47.27%) | 124/256 bitai (48.44%) |  16/64 bitų (25.00%) |
+|Maksimalus skirtumas | 214/256 bitų (83.59%) | 219/256 bitai (85.55%) | 50/64 bitų (78.12%) |
+|Vidutinis skirtumas | 168.90 bitų (65.98%) |  168.99 bitai (33.01%) | 32.03 bitų (50.05%) |
+| Kolizijos (0 bitų skirtumas) | 0 (0.0000%) | 0 (0.0000%) | 0 (0.0000%) |
+
+
+#### Hex simbolių lygmenyje:
+|  | AI hash | SHA-256  | LIDL hash|
+|---|---|---|---|
+|Minimalus skirtumas| 50/64 simbolių (78.1250%) | 49 simboliai (76.56%) |  9/16 simbolių (56.25%)|
+|Maksimalus skirtumas | 64/64 simbolių (100.0000%)| 64 simboliai (100.00%) | 16/16 simbolių (100.00%)  |
+|Vidutinis skirtumas | 59.98 simbolių (93.72%) |   60.00 simboliai (93.75% hash'o ilgio) | 15.00 simbolių (93.77%) |
+| Kolizijos (0 simbolių skirtumas) | 0 (0.0000%) | 0 (0.0000%) | 0 (0.0000%) |
+
+
+
 
