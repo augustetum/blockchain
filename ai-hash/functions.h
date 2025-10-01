@@ -5,9 +5,12 @@
 #include <vector>
 #include <cstdint>
 #include <chrono>
-
+#include <fstream>
+#include <limits>
+#include <filesystem>
 
 std::string pasirinktiFaila();
+std::string failoNuskaitymas();
 
 class CustomHash {
 private:

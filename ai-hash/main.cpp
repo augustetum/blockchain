@@ -10,33 +10,33 @@ int main()
     std::cout << "Hashing from a file | 2" << std::endl;
     std::cin >> hashInput;
     std::string input;
+    switch(hashInput){
+        case 1:{
+            std::cout << "Enter string to hash: ";
+            std::getline(std::cin, input);
+            std::cout << "Enter salt: ";
+            std::string salt;
+            std::getline(std::cin, salt);
+            std::string salted_input = input + salt;
 
-    //sutvarkyt, nes input not declared visam scope
-    if (hashInput == 1)
-    {
-        std::cout << "Enter string to hash: ";
-        std::getline(std::cin, input);
+            std::string result = CustomHash::hash(salted_input);
+            std::cout<< result<<std::endl;
+            break;
+            
+        }
+
+        case 2:{
+            std::string input = pasirinktiFaila();
+            std::cout << "Enter salt: ";
+            std::string salt;
+            std::getline(std::cin, salt);
+            std::string salted_input = input + salt;
+
+            std::string result = CustomHash::hash(salted_input);
+            std::cout<< result<<std::endl;
+            break;
+        }
+        return 0;
+
     }
-    else
-    {
-        pasirinktiFaila();
-    }
-
-    std::cout << "Enter salt: ";
-    std::string salt;
-    std::getline(std::cin, salt);
-
-    std::string salted_input = input + salt;
-    std::string result = CustomHash::hash(salted_input);
-    std::cout << std::endl;
-    std::cout << "| String     | " << input << std::endl;
-    std::cout << "| --------" << std::endl;
-    std::cout << "| Hash value | " << result << std::endl;
-    std::cout << std::endl;
-    return 0;
 }
-
-
-//failo nuskaitymas is OOP
-//testai
-//
