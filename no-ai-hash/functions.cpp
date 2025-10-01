@@ -18,7 +18,7 @@
 std::string pasirinktiFaila(){
     while(true){
         try{
-            system("ls *.txt failaiHashavimui/*.txt 2>/dev/null > temp.txt");    
+            system("ls *.txt ../failaiHashavimui/*.txt 2>/dev/null > temp.txt");    
             //system("for /r %A in (*.txt) do @echo %~nxA >> temp.txt"); //windowsam
             std::ifstream tempFail("temp.txt");
             std::vector<std::string> failuPav;
@@ -178,20 +178,33 @@ std::string stringGeneratorius(int length, std::mt19937& gen) {
     return result;
 }
 
-// Function to calculate the number of differing bits between two strings
+//Bitų skirtumas (hex string → bit skirtumai)
 int countBitDifference(const std::string& str1, const std::string& str2) {
     int diff = 0;
     for (size_t i = 0; i < str1.size() && i < str2.size(); ++i) {
-        unsigned char x = str1[i] ^ str2[i];
-        while (x) {
-            diff += x & 1;
-            x >>= 1;
+        // Konvertuojame hex char į 4-bit reikšmę
+        auto hexToBits = [](char c) -> int {
+            if (c >= '0' && c <= '9') return c - '0';
+            if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+            if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+            return 0;
+        };
+
+        int val1 = hexToBits(str1[i]);
+        int val2 = hexToBits(str2[i]);
+        int xorResult = val1 ^ val2;
+
+        // Skaičiuojame, kiek bitų skiriasi (4 bitai per hex char)
+        for (int bit = 0; bit < 4; ++bit) {
+            if (xorResult & (1 << bit)) {
+                diff++;
+            }
         }
     }
     return diff;
 }
 
-// Function to calculate the number of differing hex characters between two strings
+//Hex skirtumas
 int countHexDifference(const std::string& str1, const std::string& str2) {
     int diff = 0;
     for (size_t i = 0; i < str1.size() && i < str2.size(); ++i) {
@@ -202,6 +215,7 @@ int countHexDifference(const std::string& str1, const std::string& str2) {
     return diff;
 }
 
+//Lavinos efekto testas
 void lavinosEfektas(int numPairs) {
     HashGenerator hashGenerator;
     std::random_device rd;
@@ -264,29 +278,41 @@ void lavinosEfektas(int numPairs) {
     auto endTime = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = endTime - startTime;
 
+    size_t hashLength = hashGenerator.generateHash("test").length(); // 8 hex simboliai
+    size_t hashBitLength = hashLength * 4; // 8 hex * 4 bits = 32 bitai
+
     double avgBitDiff = static_cast<double>(totalBitDiff) / numPairs;
     double avgHexDiff = static_cast<double>(totalHexDiff) / numPairs;
-    double bitDiffPercentage = (avgBitDiff / (hashGenerator.generateHash("test").length() * 8)) * 100.0;
-    double hexDiffPercentage = (avgHexDiff / static_cast<double>(hashGenerator.generateHash("test").length())) * 100.0;
-
-    size_t hashBitLength = hashGenerator.generateHash("test").length() * 4; // Each hex char = 4 bits
+    double bitDiffPercentage = (avgBitDiff / hashBitLength) * 100.0;
+    double hexDiffPercentage = (avgHexDiff / hashLength) * 100.0;
     
     std::cout << "\n=== Lavinos efekto testavimo rezultatai ===" << std::endl;
     std::cout << "Iš viso išbandyta porų: " << numPairs << std::endl;
-    std::cout << "Testo trukmė: " << duration.count() << " sekundžių" << std::endl;
-    
-    std::cout << "\nBitų lygmenyje (hash ilgis: " << hashBitLength << " bitai):" << std::endl;
+    std::cout << "Testo trukmė: " << std::fixed << std::setprecision(2) << duration.count() << " s" << std::endl;
+    std::cout << "Hash'o dydis: " << hashLength << " hex simboliai (" << hashBitLength << " bitai)" << std::endl;
+
+    std::cout << "\n--- Bitų lygmenyje ---" << std::endl;
     std::cout << std::fixed << std::setprecision(2);
-    std::cout << "  Minimalus skirtumas: " << minBitDiff << " bitai (" << (minBitDiff * 100.0 / hashBitLength) << "%)" << std::endl;
-    std::cout << "  Maksimalus skirtumas: " << maxBitDiff << " bitai (" << (maxBitDiff * 100.0 / hashBitLength) << "%)" << std::endl;
-    std::cout << "  Vidutinis skirtumas: " << avgBitDiff << " bitai (" << bitDiffPercentage << "% hash'o ilgio)" << std::endl;
-    std::cout << "  Porų be skirtumų: " << zeroBitDiffs << " (" << (zeroBitDiffs * 100.0 / numPairs) << "%)" << std::endl;
-    
-    std::cout << "\nHex simbolių lygmenyje:" << std::endl;
-    std::cout << "  Minimalus skirtumas: " << minHexDiff << " simboliai (" << (minHexDiff * 100.0 / (hashBitLength/4)) << "%)" << std::endl;
-    std::cout << "  Maksimalus skirtumas: " << maxHexDiff << " simboliai (" << (maxHexDiff * 100.0 / (hashBitLength/4)) << "%)" << std::endl;
-    std::cout << "  Vidutinis skirtumas: " << avgHexDiff << " simboliai (" << hexDiffPercentage << "% hash'o ilgio)" << std::endl;
-    std::cout << "  Porų be skirtumų: " << zeroHexDiffs << " (" << (zeroHexDiffs * 100.0 / numPairs) << "%)" << std::endl;
+    std::cout << "  Minimalus skirtumas: " << minBitDiff << "/" << hashBitLength << " bitų ("
+              << (minBitDiff * 100.0 / hashBitLength) << "%)" << std::endl;
+    std::cout << "  Maksimalus skirtumas: " << maxBitDiff << "/" << hashBitLength << " bitų ("
+              << (maxBitDiff * 100.0 / hashBitLength) << "%)" << std::endl;
+    std::cout << "  Vidutinis skirtumas: " << std::setprecision(2) << avgBitDiff << " bitų ("
+              << bitDiffPercentage << "%)" << std::endl;
+    std::cout << "  Idealus lavinos efektas: 50% (16.00 bitų)" << std::endl;
+    std::cout << "  Kolizijos (0 bitų skirtumas): " << zeroBitDiffs << " ("
+              << std::setprecision(4) << (zeroBitDiffs * 100.0 / numPairs) << "%)" << std::endl;
+
+    std::cout << "\n--- Hex simbolių lygmenyje ---" << std::endl;
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "  Minimalus skirtumas: " << minHexDiff << "/" << hashLength << " simbolių ("
+              << (minHexDiff * 100.0 / hashLength) << "%)" << std::endl;
+    std::cout << "  Maksimalus skirtumas: " << maxHexDiff << "/" << hashLength << " simbolių ("
+              << (maxHexDiff * 100.0 / hashLength) << "%)" << std::endl;
+    std::cout << "  Vidutinis skirtumas: " << std::setprecision(2) << avgHexDiff << " simbolių ("
+              << hexDiffPercentage << "%)" << std::endl;
+    std::cout << "  Kolizijos (0 simbolių skirtumas): " << zeroHexDiffs << " ("
+              << std::setprecision(4) << (zeroHexDiffs * 100.0 / numPairs) << "%)" << std::endl;
 
     std::cout << "\n=== Testas baigtas ===" << std::endl;
 }
@@ -324,4 +350,142 @@ void kolizijos() {
     auto endTime = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> diff = endTime - startTime;
     std::cout << "Laikas: " << diff.count() << " s" << std::endl;
+}
+
+void hidingPuzzleTest() {
+    HashGenerator hashGenerator;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    
+    std::cout << "=== Hiding savybės testas ===" << std::endl;
+    
+    std::string salt = stringGeneratorius(32, gen);
+    std::string secret = "Slapta žinutė";
+    
+    std::cout << "   Salt (r): " << salt << std::endl;
+    std::cout << "   Secret (x): " << secret << std::endl;
+    
+    std::string hash = hashGenerator.generateHash(salt + secret);
+    std::cout << "   H(r || x): " << hash << std::endl;
+    
+    
+    std::cout << "\n=== Puzzle-Friendliness testas ===" << std::endl;
+    std::cout << "Ieškoma x' tokio, kad H(r || x') prasideda su '0'..." << std::endl;
+    
+    const int NUM_TRIALS = 10;  
+    const std::string TARGET_PREFIX = "0";
+    const double EXPECTED_ATTEMPTS = 16.0;  // 16^1 = 16 (vienas hex simbolis)
+    
+    std::vector<int> all_attempts;
+    
+    for (int trial = 0; trial < NUM_TRIALS; trial++) {
+        int attempts = 0;
+        std::string x_prime;
+        std::string target_hash;
+        
+        while (true) {
+            x_prime = stringGeneratorius(10, gen);
+            target_hash = hashGenerator.generateHash(salt + x_prime);
+            attempts++;
+            
+            if (target_hash.substr(0, TARGET_PREFIX.length()) == TARGET_PREFIX) {
+                all_attempts.push_back(attempts);
+                break;
+            }
+        }
+        
+        std::cout << "   Bandymas #" << (trial + 1) << ": x' rastas po " 
+                  << attempts << " bandymų (x' = " << x_prime 
+                  << ", H = " << target_hash << ")" << std::endl;
+    }
+    
+    //Statistika
+    double mean = std::accumulate(all_attempts.begin(), all_attempts.end(), 0.0) / NUM_TRIALS;
+    double variance = 0.0;
+    for (int a : all_attempts) {
+        variance += (a - mean) * (a - mean);
+    }
+    variance /= NUM_TRIALS;
+    double std_dev = std::sqrt(variance);
+    
+    std::cout << "\n   Statistika per " << NUM_TRIALS << " bandymų:" << std::endl;
+    std::cout << "   - Tikėtina bandymų (16^1): ~" << EXPECTED_ATTEMPTS << std::endl;
+    std::cout << "   - Faktinis vidurkis: " << std::fixed << std::setprecision(2) << mean << std::endl;
+    std::cout << "   - Standartinis nuokrypis: " << std_dev << std::endl;
+    std::cout << "   - Mažiausiai bandymų: " << *std::min_element(all_attempts.begin(), all_attempts.end()) << std::endl;
+    std::cout << "   - Daugiausiai bandymų: " << *std::max_element(all_attempts.begin(), all_attempts.end()) << std::endl;
+    
+    double ratio = mean / EXPECTED_ATTEMPTS;
+    std::cout << "   - Santykis (faktinis/tikėtinas): " << ratio << std::endl;
+    
+    bool passes = std::abs(mean - EXPECTED_ATTEMPTS) < (2 * std_dev / std::sqrt(NUM_TRIALS));
+    std::cout << "\n   Testas " << (passes ? "PAVYKO" : "NEPAVYKO") << std::endl;
+}
+
+void testHashPerformance() {
+    const std::string filename = "../failaiHashavimui/konstitucija.txt";
+    std::ifstream file(filename);
+    
+    if (!file.is_open()) {
+        std::cerr << "Nepavyko atidaryti failo: " << filename << std::endl;
+        return;
+    }
+    
+    // Read all lines from the file
+    std::vector<std::string> lines;
+    std::string line;
+    while (std::getline(file, line)) {
+        if (!line.empty()) {
+            lines.push_back(line);
+        }
+    }
+    file.close();
+    
+    if (lines.empty()) {
+        std::cerr << "Failas tusčias arba neturi eilučių" << std::endl;
+        return;
+    }
+    
+    HashGenerator hashGenerator;
+    
+    std::cout << "=== Hash'avimo efektyvumo testas ===" << std::endl;
+    std::cout << "Failas: " << filename << std::endl;
+    std::cout << "Iš viso eilučių: " << lines.size() << std::endl;
+    std::cout << std::string(60, '-') << std::endl;
+    std::cout << std::setw(10) << "Eilučių" << std::setw(20) << "Laikas (s)" 
+              << std::setw(20) << "Vid. laikas (ms)" << std::setw(15) << "Hash'as" << std::endl;
+    std::cout << std::string(60, '-') << std::endl;
+    
+    for (int chunkSize = 1; chunkSize <= lines.size(); ) {
+        std::string input;
+        for (int i = 0; i < chunkSize; ++i) {
+            input += lines[i] + "\n";
+        }
+
+        hashGenerator.generateHash("apsilimas");
+
+        auto start = std::chrono::high_resolution_clock::now();
+        std::string hash = hashGenerator.generateHash(input);
+        auto end = std::chrono::high_resolution_clock::now();
+
+        std::chrono::duration<double> duration = end - start;
+        double avgTimePerHash = duration.count() * 1000.0; // Convert to milliseconds
+
+        std::cout << std::setw(10) << chunkSize
+                  << std::setw(20) << std::scientific << std::setprecision(6) << duration.count()
+                  << std::setw(20) << std::fixed << std::setprecision(6) << avgTimePerHash
+                  << std::setw(15) << hash.substr(0, 8) << "..." << std::endl;
+
+        if (chunkSize >= lines.size()) {
+            break;
+        }
+
+        chunkSize *= 2;
+        if (chunkSize > lines.size()) {
+            chunkSize = lines.size();
+        }
+    }
+    
+    std::cout << std::string(60, '-') << std::endl;
+    std::cout << "Testas baigtas" << std::endl;
 }

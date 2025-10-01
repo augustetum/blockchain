@@ -11,10 +11,9 @@
 using namespace std;
 
     string HashGenerator::generateHash(string input){
-        string darbinis = stringToHex(input);
-
         int weightSum = weightedSum(input);
-        int offset = (int) input.back(); //vat sita vieta biski nepatinka TODO: upgradint
+        string darbinis = stringToHex(input);
+        int offset = weightedSum(darbinis);
 
         uint32_t result = varikliukas(prekesKodai[weightSum], offset); 
 

@@ -13,6 +13,8 @@ int main(){
     std::cout << "2 | Nuskaityti failą" << std::endl;
     std::cout << "3 | Kolizijų paieška" << std::endl;
     std::cout << "4 | Lavinos efekto testas" << std::endl;
+    std::cout << "5 | Hiding/puzzle-friendliness testas" << std::endl;
+    std::cout << "6 | Hash'avimo efektyvumo testas" << std::endl;
     std::cin >> menuChoice;
 
     switch(menuChoice){
@@ -53,6 +55,13 @@ int main(){
             break;
         case 4:
             lavinosEfektas(100000);
+            break;
+        case 5:
+            hidingPuzzleTest();
+            break;
+        case 6:
+            testHashPerformance();
+            break;
         }
     }
 
