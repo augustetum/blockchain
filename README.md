@@ -287,4 +287,79 @@ Testavimas darytas naudojant failus su kuriais buvo testuojamas ir mūsų kurtas
 - **Mažiausiai bandymų:** 368
 - **Daugiausiai bandymų:** 16739
 
+# v0.2 ir kursiokų (Nika ir Anastasija) AES hashų palyginimai
+
+### Išvedimo ilgis 
+| AES hash | v0.2 |
+| ---- | ----- |
+| 32 simboliai (128 bitai) | 16 simbolių (64 bitai) |
+
+### Deterministiškumas
+| AES hash | v0.2 |
+| ---- | ----- |
+| Deterministinis | Deterministinis |
+
+### Kolizijos
+Porų skaičius: 1000000, vieno string poroje ilgis: 10
+| AES hash | v0.2 |
+| ---- | ----- |
+| 0.000000 % | 0.000000 % |
+
+### Lavinos efektas 
+
+
+<table>
+ <tr>
+  <td></td>
+  <td><h2>AES HEX</h2></td>
+  <td><h2>v0.2 HEX</h2></td>
+ </tr>
+
+ <tr>
+  <td><h3>MIN</h3></td>
+  <td>68.75%</td>
+  <td>78.1250%</td>
+ </tr>
+
+ <tr>
+  <td><h3>VID</h3></td>
+  <td>93.77%</td>
+  <td>93.75%</td>
+ </tr>
+
+ <tr>
+  <td><h3>MAX</h3></td>
+  <td>100.00%</td>
+  <td>100.00%</td>
+ </tr>
+ 
+</table>
+
+<table>
+ <tr>
+  <td></td>
+  <td><h2>AES BIT</h2></td>
+  <td><h2>v0.2 BIT</h2></td>
+ </tr>
+
+ <tr>
+  <td><h3>MIN</h3></td>
+  <td>31.25%</td>
+  <td>47.27%</td>
+ </tr>
+
+ <tr>
+  <td><h3>VID</h3></td>
+  <td>50.00%	</td>
+  <td>66.01%</td>
+ </tr>
+
+ <tr>
+  <td><h3>MAX</h3></td>
+  <td>67.97%</td>
+  <td>86.72%</td>
+ </tr>
+ 
+</table>
+
 
